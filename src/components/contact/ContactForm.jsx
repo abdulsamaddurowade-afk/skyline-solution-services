@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { company } from '../../data/company.js';
 import { serviceOptions } from '../../data/services.js';
 
+// Formspree receives each request and emails it to the company inbox
+const FORMSPREE_URL = 'https://formspree.io/f/xljgobnp';
+
 const emptyForm = {
     name: '',
     email: '',
@@ -11,31 +14,49 @@ const emptyForm = {
 
 export default function ContactForm() {
     const [form, setForm] = useState(emptyForm);
+    const [state, setState] = useState('idle'); // idle | sending | sent | error
     const [status, setStatus] = useState('');
 
     const handleChange = (e) => {
         setForm((current) => ({ ...current, [e.target.name]: e.target.value }));
     };
 
-    // No backend yet: hands the request to the visitor's email app
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setState('sending');
+        setStatus('');
 
         const fullName = form.name.trim();
         const serviceLabel = serviceOptions.find((option) => option.value === form.service).label;
-        const subject = `Website enquiry: ${serviceLabel}`;
-        const body = [
-            `Name: ${fullName}`,
-            `Email: ${form.email.trim()}`,
-            `Requested service: ${serviceLabel}`,
-            '',
-            form.message.trim(),
-        ].join('\n');
 
-        window.location.href = `mailto:${company.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        try {
+            const response = await fetch(FORMSPREE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({
+                    name: fullName,
+                    email: form.email.trim(),
+                    service: serviceLabel,
+                    message: form.message.trim(),
+                    _subject: `Website enquiry: ${serviceLabel}`,
+                }),
+            });
 
-        setStatus(`Thank you, ${fullName}! Your email app should open with your request ready to send. If it doesn't, please email us at ${company.email}.`);
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                throw new Error(data.errors?.map((error) => error.message).join(', ') || 'Request failed');
+            }
+
+            setState('sent');
+            setStatus(`Thank you, ${fullName}! Your request has been sent. We will get back to you shortly.`);
+            setForm(emptyForm);
+        } catch {
+            setState('error');
+            setStatus(`Sorry, your request could not be sent. Please try again, or email us at ${company.email}.`);
+        }
     };
+
+    const sending = state === 'sending';
 
     return (
         <form onSubmit={handleSubmit}>
@@ -59,8 +80,10 @@ export default function ContactForm() {
                 <label htmlFor="message">Project Requirements Details</label>
                 <textarea id="message" name="message" rows="4" placeholder="Describe your project scope..." value={form.message} onChange={handleChange}></textarea>
             </div>
-            <button type="submit" className="btn btn-submit">Submit Request</button>
-            <p className="form-status" role="status" aria-live="polite">{status}</p>
+            <button type="submit" className="btn btn-submit" disabled={sending}>
+                {sending ? 'Sending...' : 'Submit Request'}
+            </button>
+            <p className={`form-status${state === 'error' ? ' form-status-error' : ''}`} role="status" aria-live="polite">{status}</p>
         </form>
     );
 }
