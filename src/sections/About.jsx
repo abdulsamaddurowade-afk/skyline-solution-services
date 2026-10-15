@@ -1,7 +1,8 @@
 import { FaEye, FaBullseye } from 'react-icons/fa6';
 import SectionHeader from '../components/common/SectionHeader.jsx';
 import Reveal from '../components/common/Reveal.jsx';
-import { company } from '../data/company.js';
+import Slideshow from '../components/common/Slideshow.jsx';
+import { projectPhotos } from '../data/projectPhotos.js';
 
 export default function About() {
     return (
@@ -27,7 +28,7 @@ export default function About() {
                         </div>
                     </Reveal>
                     <Reveal className="about-image">
-                        <img src={company.aboutImage} alt="Construction site" width="800" height="600" loading="lazy" />
+                        <Slideshow slides={projectPhotos} label="Project photos" />
                     </Reveal>
                 </div>
             </div>

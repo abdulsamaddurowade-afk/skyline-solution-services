@@ -3,6 +3,7 @@ import { MotionConfig } from 'framer-motion';
 import SmoothScroll from './components/common/SmoothScroll.jsx';
 import Loader from './components/common/Loader.jsx';
 import ScrollProgress from './components/common/ScrollProgress.jsx';
+import BackToTop from './components/common/BackToTop.jsx';
 import Navbar from './components/layout/Navbar.jsx';
 import Footer from './components/layout/Footer.jsx';
 import Hero from './sections/Hero.jsx';
@@ -10,6 +11,7 @@ import StatsBar from './sections/StatsBar.jsx';
 import About from './sections/About.jsx';
 import Services from './sections/Services.jsx';
 import Goals from './sections/Goals.jsx';
+import Clients from './sections/Clients.jsx';
 import Team from './sections/Team.jsx';
 import Contact from './sections/Contact.jsx';
 
@@ -33,10 +35,12 @@ export default function App() {
                     <About />
                     <Services />
                     <Goals />
+                    <Clients />
                     <Team />
                     <Contact />
                 </main>
                 <Footer />
+                <BackToTop />
             </SmoothScroll>
         </MotionConfig>
     );

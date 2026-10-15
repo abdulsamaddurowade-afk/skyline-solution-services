@@ -3,10 +3,11 @@ import SectionHeader from '../components/common/SectionHeader.jsx';
 import Reveal from '../components/common/Reveal.jsx';
 import { leadership, departments } from '../data/team.js';
 
-function TreeNode({ level, role, description }) {
+function TreeNode({ level, role, description, icon: Icon }) {
     return (
         <div className={`tree-node level-${level}`}>
             <div className="node-content">
+                <div className="node-icon"><Icon aria-hidden="true" /></div>
                 <h5>{role}</h5>
                 <p>{description}</p>
             </div>
